@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 
 # Initialize the camera
-cap = cv2.VideoCapture(-1)
+cap = cv2.VideoCapture(0)
 
 # Define the lower and upper bounds of the laser color in the HSV color space
-lower_laser = np.array([0, 100, 100])
-upper_laser = np.array([10, 255, 255])
+lower_laser = np.array([280, 30, 75])
+upper_laser = np.array([330, 80, 120])
 
 while True:
     # Capture a frame from the camera
@@ -33,6 +33,12 @@ while True:
         if M["m00"] != 0:
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
+
+            # Get the HSV value of the centroid
+            (h, s, v) = hsv[cY, cX]
+            
+            # Print the HSV value
+            print("HSV:", (h, s, v))
             
             # Draw a circle at the centroid on the original frame
             cv2.circle(frame, (cX, cY), 5, (0, 0, 255), -1)
