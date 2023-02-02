@@ -5,8 +5,8 @@ import numpy as np
 cap = cv2.VideoCapture(-1)
 
 # Define the lower and upper bounds of the laser color in the HSV color space
-lower_laser = np.array([280, 30, 75])
-upper_laser = np.array([330, 80, 120])
+lower_laser = np.array([150, 0, 0])
+upper_laser = np.array([190, 50, 250])
 
 while True:
     # Capture a frame from the camera
