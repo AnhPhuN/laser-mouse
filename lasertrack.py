@@ -11,6 +11,9 @@ upper_laser = np.array([330, 80, 120])
 while True:
     # Capture a frame from the camera
     ret, frame = cap.read()
+
+    frame = cv2.convertScaleAbs(frame, alpha=1.5, beta=0)
+
     
     # Convert the frame to the HSV color space
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
