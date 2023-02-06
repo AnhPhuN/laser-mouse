@@ -20,17 +20,18 @@ screen_height = 1080
 # Initialize the mouse
 mouse = adafruit_hid.mouse.Mouse(board.USB)
 
+# takes in position of laser on camera screen and returns position on computer screen
 def coordinate_transform(x, y, x1, y1, x2, y2):
     if x >= x1 and x <= x2 and y >= y1 and y <= y2:
         return (x - x1, y - y1)
     else:
         return None
 
-def get_mouse_position(x, y):
-    # mouse position fed to computer
-    x = x * 32767 / camera_screen_width
-    y = y * 32767 / camera_screen_height
-    return (x, y)
+# def get_mouse_position(x, y):
+#     # mouse position fed to computer
+#     x = x * 32767 / camera_screen_width
+#     y = y * 32767 / camera_screen_height
+#     return (x, y)
 
 # Initialize the camera
 cap = cv2.VideoCapture(0)
@@ -38,6 +39,10 @@ cap = cv2.VideoCapture(0)
 # Define the lower and upper bounds of the laser color in the HSV color space
 lower_laser = np.array([150, 0, 0])
 upper_laser = np.array([190, 50, 250])
+
+# move mouse to top left
+mouse.move(-screen_width, -screen_height)
+old_position = (0, 0)
 
 while True:
     # Capture a frame from the camera
@@ -68,12 +73,15 @@ while True:
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
 
-            # coordinate_transformed = coordinate_transform(cX, cY, x1, y1, x2, y2)
-
-            # Get the HSV value of the centroid
-            (h, s, v) = hsv[cY, cX]
+            coordinate_transformed = coordinate_transform(cX, cY, x1, y1, x2, y2)
+            if coordinate_transformed is not None:
+                mouse.move(coordinate_transformed[0] - old_position[0], coordinate_transformed[1] - old_position[1])
+                old_position = coordinate_transformed
             
-            # Print the HSV value
+
+
+            # Get the HSV value of the centroid (for debugging)
+            (h, s, v) = hsv[cY, cX]
             print("HSV:", (h, s, v))
             
             # Draw a circle at the centroid on the original frame
