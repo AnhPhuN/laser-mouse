@@ -4,6 +4,7 @@ import board
 import digitalio
 import adafruit_hid.mouse
 
+
 # monitor bounding box:
 (x1, y1) = (40, 50)
 (x2, y2) = (60, 70)
@@ -15,6 +16,11 @@ camera_screen_height = y2 - y1
 # screen resolution
 screen_width = 1920
 screen_height = 1080
+
+# Define the threshold for how long the laser can be gone before clicking the mouse
+threshold = 10 # 10 frames
+# Define a timer to keep track of how long the laser has been gone
+disappearance_timer = 11
 
 
 # Initialize the mouse
@@ -62,6 +68,9 @@ while True:
     
     # Check if any contours were found
     if len(contours) > 0:
+
+        # set time of laser gone to 0
+        disappearance_timer = 0
         # Find the largest contour
         largest_contour = max(contours, key=cv2.contourArea)
         
@@ -86,7 +95,14 @@ while True:
             
             # Draw a circle at the centroid on the original frame
             cv2.circle(frame, (cX, cY), 5, (0, 0, 255), -1)
-    
+    else:
+        # Increment the disappearance timer
+        disappearance_timer += 1
+        # If the laser has been gone for the threshold number of frames, print "hello"
+        if disappearance_timer == threshold:
+            mouse.click(Mouse.LEFT_BUTTON)
+            disappearance_timer = 0
+
     # Show the original frame with the laser position
     cv2.imshow("Laser Detection", frame)
     
